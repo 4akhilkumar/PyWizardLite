@@ -54,7 +54,7 @@ class PyWizardLite:
         Initialize the PyWizardLite class
         """
         self.__file_response = None
-        self.__driver = None
+        self.__driver = "chromedriver.exe"
 
     def system_requirements(self) -> bool:
         """
@@ -124,19 +124,36 @@ class PyWizardLite:
 
         Args:
             url (str): The url to get the request from
+            proxy_url (str, optional): The proxy url. Defaults to None.
+            _stream (bool, optional): The stream. Defaults to None.
 
         Returns:
             requests.models.Response: The response
         """
         set_proxy = self.__set_proxy(proxy_url = proxy_url)
-        response = requests.get(url, proxies = set_proxy, stream = _stream, timeout = 120)
-        return response
+        try:
+            response = requests.get(url, proxies = set_proxy, stream = _stream, timeout = 120)
+            return response
+        except requests.exceptions:
+            return None
+
+    def __is_driver_exists(self) -> bool:
+        """
+        Check if the driver exists
+        # os.path.join(os.getcwd(), self.__driver)
+
+        Returns:
+            bool: True if the driver exists, False otherwise
+        """
+        # check driver exists in the current directory
+        if os.path.exists(self.__driver):
+            return True
+        return False
 
     def __extract_zip(self):
         """
         Extract the zip file
         """
-        self.__driver = "chromedriver.exe"
         with ZipFile(io.BytesIO(self.__file_response.content)) as zip_file:
             zip_file.extract(self.__driver)
 
@@ -147,9 +164,19 @@ class PyWizardLite:
         # Set execute permissions on the ChromeDriver binary
         os.chmod(self.__driver, 0o755)
 
+    def driver_download_path(self) -> str:
+        """
+        Get the driver download path
+        """
+        self.download_path = str(os.path.join(os.getcwd(), self.__driver))
+        return self.download_path
+
     def __download_chrome_web_driver(self, proxy_url: str = None):
         """
         Download the chrome web driver
+
+        Args:
+            proxy_url (str, optional): The proxy url. Defaults to None.
         """
         base_url = "https://chromedriver.storage.googleapis.com"
 
@@ -178,14 +205,24 @@ class PyWizardLite:
         # Set the execution permission
         self.__set_execusion_permission()
 
+        # Get the download path
+        self.driver_download_path()
+
     def setup_chrome_web_driver(self, proxy_url: str = None):
         """
         Setup the chrome web driver
+
+        Args:
+            proxy_url (str, optional): The proxy url. Defaults to None.
         """
         # Check if the system meets the requirements
         if self.system_requirements():
+            if self.__is_driver_exists():
+                return self.driver_download_path()
             # Download the chrome web driver
             self.__download_chrome_web_driver(proxy_url = proxy_url)
+            path = str(self.download_path) if self.download_path else None
+            return path
         else:
             print("System does not meet the requirements")
             sys.exit(0)
