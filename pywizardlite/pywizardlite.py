@@ -278,6 +278,72 @@ class PyWizardLite:
                 break
             time.sleep(1)
 
+    def wait_until_css_condition(driver, element_by,
+                                 element: str, css_prop: str, css_value: str, default_time: int = None):
+        """
+        This function waits until the css condition met and default time is 60 seconds
+
+        Args:
+            element_by (Web Element Object): Set of supported locator strategies
+            Acceptable values are ClassName, CSSSelector, ID, LinkText, Name,
+            PartialLinkText, TagName, XPath
+
+            css_prop (str): The CSS property of the element
+            css_value (str): The CSS value of that property
+
+            element (Web Element Object): The web element which need to be checked
+            default_time (int, Optional): The max time to wait
+        """
+        element_dict = {
+            "ClassName": By.CLASS_NAME,
+            "CSSSelector": By.CSS_SELECTOR,
+            "ID": By.ID,
+            "LinkText": By.LINK_TEXT,
+            "Name": By.NAME,
+            "PartialLinkText": By.PARTIAL_LINK_TEXT,
+            "TagName": By.TAG_NAME,
+            "XPath": By.XPATH
+        }
+
+        if default_time is None:
+            wait_time = 60
+        else:
+            wait_time = default_time
+
+        found_wait_time = 1
+        start_time = time.time()
+
+        while True:
+            condition = False
+            end_time = time.time()
+            total_time = int(end_time - start_time)
+            if total_time >= wait_time:
+                raise Exception(f'The element - {element} not found within the limited time!')
+
+            try:
+                is_web_element_found = driver.find_element(element_dict[element_by], element)
+                if is_web_element_found is not None:
+                    # Now fetch the inline style of the element
+                    inline_style = is_web_element_found.get_attribute('style')
+                    # Store the css property and value in a dictionary
+                    style_dict = {}
+                    for each_style in inline_style.split(';'):
+                        if each_style != '':
+                            prop, value = each_style.split(':')
+                            style_dict[prop.strip()] = value.strip()
+                    # Check the condition
+                    if style_dict[css_prop] == css_value:
+                        condition = True
+                    is_element_found = True
+            except Exception:
+                is_element_found = False
+                condition = False
+
+            if is_element_found and condition:
+                time.sleep(found_wait_time)
+                break
+            time.sleep(1)
+
     def generate_string_xpath(driver, text: str):
         """
         Generate the xpath of the string
