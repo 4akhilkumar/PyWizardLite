@@ -227,7 +227,7 @@ class PyWizardLite:
             print("System does not meet the requirements")
             sys.exit(0)
 
-    def wait_until_element_is_visible(self, driver, element_by,
+    def wait_until_element_is_visible(driver, element_by,
                                       element: str, default_time: int = None):
         """
         This function waits until the element is active and default time is 60 seconds
@@ -278,7 +278,7 @@ class PyWizardLite:
                 break
             time.sleep(1)
 
-    def generate_string_xpath(self, driver, text: str):
+    def generate_string_xpath(driver, text: str):
         """
         Generate the xpath of the string
 
