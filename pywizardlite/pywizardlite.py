@@ -140,7 +140,6 @@ class PyWizardLite:
     def __is_driver_exists(self) -> bool:
         """
         Check if the driver exists
-        # os.path.join(os.getcwd(), self.__driver)
 
         Returns:
             bool: True if the driver exists, False otherwise
