@@ -269,7 +269,7 @@ class PyWizardLite:
                 is_web_element_found = driver.find_element(element_dict[element_by], element)
                 if is_web_element_found is not None:
                     is_element_found = True
-            except ElementNotFound:
+            except Exception:
                 is_element_found = False
 
             if is_element_found:
