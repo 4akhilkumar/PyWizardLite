@@ -20,6 +20,7 @@ from zipfile import ZipFile
 
 try:
     from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import Select
 except ImportError:
     raise ImportError("Please install selenium package")
 
@@ -269,6 +270,62 @@ class PyWizardLite:
                 is_web_element_found = driver.find_element(element_dict[element_by], element)
                 if is_web_element_found is not None:
                     is_element_found = True
+            except Exception:
+                is_element_found = False
+
+            if is_element_found:
+                time.sleep(found_wait_time)
+                break
+            time.sleep(1)
+
+    def wait_and_select_option(driver, element_by, element: str, 
+                      option: str, default_time: int = None):
+        """
+        This function waits until the option is visible and default time is 60 seconds
+
+        Args:
+            driver (WebDriver Object): The web driver object
+            element_by (Web Element Object): Set of supported locator strategies
+            Acceptable values are ClassName, CSSSelector, ID, LinkText, Name,
+            PartialLinkText, TagName, XPath
+
+            element (Web Element Object): The web element which need to be checked
+            option (str): The option which need to be selected
+            default_time (int, Optional): The max time to wait
+        """
+        element_dict = {
+            "ClassName": By.CLASS_NAME,
+            "CSSSelector": By.CSS_SELECTOR,
+            "ID": By.ID,
+            "LinkText": By.LINK_TEXT,
+            "Name": By.NAME,
+            "PartialLinkText": By.PARTIAL_LINK_TEXT,
+            "TagName": By.TAG_NAME,
+            "XPath": By.XPATH
+        }
+
+        if default_time is None:
+            wait_time = 60
+        else:
+            wait_time = default_time
+
+        found_wait_time = 1
+        is_element_found = False
+        start_time = time.time()
+
+        while True:
+            end_time = time.time()
+            total_time = int(end_time - start_time)
+            if total_time >= wait_time:
+                raise ElementNotFound(f'The element - {element} not found within the limited time!')
+
+            try:
+                web_element_object = driver.find_element(element_dict[element_by], element)
+                dropdown = Select(web_element_object)
+                for each_option in dropdown.options:
+                    if each_option.text == option:
+                        dropdown.select_by_visible_text(option)
+                        is_element_found = True
             except Exception:
                 is_element_found = False
 
