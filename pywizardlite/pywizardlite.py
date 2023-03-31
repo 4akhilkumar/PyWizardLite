@@ -278,7 +278,7 @@ class PyWizardLite:
                 break
             time.sleep(1)
 
-    def wait_and_select_option(driver, element_by, element: str, 
+    def wait_and_select_option(driver, element_by, element: str,
                       option: str, default_time: int = None):
         """
         This function waits until the option is visible and default time is 60 seconds
@@ -416,7 +416,7 @@ class PyWizardLite:
         const searchText = "{text}".trim();
         '''
         __js_code_2 = '''
-        const xpathExpr = `//*[contains(text(), '${searchText}')]`;
+        const xpathExpr = `//*[text()="${searchText}"]`;
 
         const xpathResult = document.evaluate(
         xpathExpr,
