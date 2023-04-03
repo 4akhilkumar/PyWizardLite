@@ -1,6 +1,6 @@
 """
-PyWizardLite is a python script that automates the process of downloading the suitable version of
-chrome driver for the chrome version installed on the machine. It also has the functionality
+PyWizardLite is a python script that automates the process of downloading the suitable version
+of chrome driver for the chrome version installed on the machine. It also has the functionality
 to generate the xpath of an element on a webpage using the text of the element and the it
 will wait for the element to be visible.
 
@@ -21,13 +21,14 @@ from zipfile import ZipFile
 try:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import Select
-except ImportError:
-    raise ImportError("Please install selenium package")
+except ImportError as exc:
+    raise ImportError("Please install selenium package") from exc
 
 try:
     import requests
-except ImportError:
-    raise ImportError("Please install requests package")
+except ImportError as exc:
+    raise ImportError("Please install requests package") from exc
+
 
 class ElementNotFound(Exception):
     """
@@ -37,8 +38,8 @@ class ElementNotFound(Exception):
 
 class PyWizardLite:
     """
-    PyWizardLite is a python script that automates the process of downloading the suitable version of
-    chrome driver for the chrome version installed on the machine. It also has the functionality
+    PyWizardLite is a python script that automates the process of downloading the suitable version
+    of chrome driver for the chrome version installed on the machine. It also has the functionality
     to generate the xpath of an element on a webpage using the text of the element and the it
     will wait for the element to be visible.
     """
@@ -56,6 +57,7 @@ class PyWizardLite:
         """
         self.__file_response = None
         self.__driver = "chromedriver.exe"
+        self.download_path = None
 
     def system_requirements(self) -> bool:
         """
@@ -335,7 +337,7 @@ class PyWizardLite:
             time.sleep(1)
 
     def wait_until_css_condition(driver, element_by,
-                                 element: str, css_prop: str, css_value: str, default_time: int = None):
+                            element: str, css_prop: str, css_value: str, default_time: int = None):
         """
         This function waits until the css condition met and default time is 60 seconds
 
@@ -374,7 +376,7 @@ class PyWizardLite:
             end_time = time.time()
             total_time = int(end_time - start_time)
             if total_time >= wait_time:
-                raise Exception(f'The element - {element} not found within the limited time!')
+                raise ElementNotFound(f'The element - {element} not found within the limited time!')
 
             try:
                 is_web_element_found = driver.find_element(element_dict[element_by], element)
